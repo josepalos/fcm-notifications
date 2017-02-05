@@ -1,2 +1,3 @@
 class Sender():
-    pass
+    def send_message(self, message):
+        pass
