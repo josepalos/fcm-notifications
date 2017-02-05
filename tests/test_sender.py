@@ -6,16 +6,18 @@ import fcm_sender
 
 
 class SenderTest(unittest.TestCase):
+    def setUp(self):
+        self.sender = Sender()
+
     def test_existing_sender(self):
-        sender = Sender()
+        pass
 
     def test_sender_has_method_send_message_with_only_message(self):
-        sender = Sender()
-        sender.send_message(message="some message")
+        self.sender.send_message(message="some message")
 
     def test_send_message_accepts_also_a_topic(self):
-        sender = Sender()
-        sender.send_message(message="some message", topic="some topic")
+        self.sender.send_message(message="some message", topic="some topic")
+
 
 class TestSendMessage(unittest.TestCase):
     @mock.patch('fcm_sender.sender.requests')
