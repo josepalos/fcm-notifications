@@ -1,5 +1,8 @@
 import unittest
+import mock
+
 from fcm_sender.sender import Sender
+import fcm_sender
 
 
 class SenderTest(unittest.TestCase):
@@ -13,3 +16,12 @@ class SenderTest(unittest.TestCase):
     def test_send_message_accepts_also_a_topic(self):
         sender = Sender()
         sender.send_message(message="some message", topic="some topic")
+
+class TestSendMessage(unittest.TestCase):
+    @mock.patch('fcm_sender.sender.requests')
+    def test_send_message_uses_requests_to_send_an_http_post_request(self, mock_requests):
+        assert mock_requests is fcm_sender.sender.requests
+
+        sender = Sender()
+        sender.send_message(message="")
+        assert mock_requests.post.called
