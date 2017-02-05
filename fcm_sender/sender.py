@@ -1,3 +1,8 @@
+import requests
+
 class Sender():
     def send_message(self, message, topic=""):
-        pass
+        try:
+            requests.post("")
+        except:
+            pass
