@@ -38,3 +38,20 @@ class TestSendMessage(unittest.TestCase):
         self.assertIsNotNone(mock_requests.post.call_args[1].get('url'))
         self.assertEqual(mock_requests.post.call_args[1].get('url'), fcm_sender.sender.fcm_url)
 
+    @mock.patch('fcm_sender.sender.requests')
+    def test_send_message_puts_data_in_the_request(self, mock_requests):
+        assert mock_requests is fcm_sender.sender.requests
+
+        sender = Sender()
+        sender.send_message(message="some message")
+
+        self.assertIsNotNone(mock_requests.post.call_args[1].get('data'))
+
+
+    @mock.patch('fcm_sender.sender.requests')
+    def test_request_data_contains_dict_data(self, mock_requests):
+        assert mock_requests is fcm_sender.sender.requests
+
+        sender = Sender()
+        sender.send_message(message="some message")
+        self.assertIsInstance(mock_requests.post.call_args[1].get('data'), dict)
