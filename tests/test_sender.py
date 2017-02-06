@@ -51,51 +51,31 @@ class SenderTest(unittest.TestCase):
 
 
 class TestSendMessage(unittest.TestCase):
-    def setUp(self):
+    @mock.patch('fcm_sender.sender.requests')
+    def setUp(self, mock_requests):
+        assert mock_requests is fcm_sender.sender.requests
         self.sender = Sender()
-
-    @mock.patch('fcm_sender.sender.requests')
-    def test_send_message_uses_requests_to_send_an_http_post_request(self, mock_requests):
-        assert mock_requests is fcm_sender.sender.requests
-
         self.sender.send_message(message="", topic="some topic")
-        assert mock_requests.post.called
+        self.mock_requests = mock_requests
 
-    @mock.patch('fcm_sender.sender.requests')
-    def test_send_message_uses_the_fcm_url(self, mock_requests):
-        assert mock_requests is fcm_sender.sender.requests
+    def test_send_message_uses_requests_to_send_an_http_post_request(self):
+        assert self.mock_requests.post.called
 
-        self.sender.send_message(message="", topic="some topic")
-        self.assertIsNotNone(mock_requests.post.call_args[1].get('url'))
-        self.assertEqual(mock_requests.post.call_args[1].get('url'), fcm_sender.sender.fcm_url)
+    def test_send_message_uses_the_fcm_url(self):
+        self.assertIsNotNone(self.mock_requests.post.call_args[1].get('url'))
+        self.assertEqual(self.mock_requests.post.call_args[1].get('url'), fcm_sender.sender.fcm_url)
 
-    @mock.patch('fcm_sender.sender.requests')
-    def test_send_message_puts_data_in_the_request(self, mock_requests):
-        assert mock_requests is fcm_sender.sender.requests
+    def test_send_message_puts_data_in_the_request(self):
+        self.assertIsNotNone(self.mock_requests.post.call_args[1].get('data'))
 
-        self.sender.send_message(message="some message", topic="some topic")
-        self.assertIsNotNone(mock_requests.post.call_args[1].get('data'))
+    def test_request_data_contains_dict_data(self):
+        self.assertIsInstance(self.mock_requests.post.call_args[1].get('data'), dict)
 
-    @mock.patch('fcm_sender.sender.requests')
-    def test_request_data_contains_dict_data(self, mock_requests):
-        assert mock_requests is fcm_sender.sender.requests
+    def test_send_message_request_has_headers(self,):
+        self.assertIsInstance(self.mock_requests.post.call_args[1].get('headers'), dict)
 
-        self.sender.send_message(message="some message", topic="some topic")
-        self.assertIsInstance(mock_requests.post.call_args[1].get('data'), dict)
-
-    @mock.patch('fcm_sender.sender.requests')
-    def test_send_message_request_has_headers(self, mock_requests):
-        assert mock_requests is fcm_sender.sender.requests
-
-        self.sender.send_message(message="some message", topic="some topic")
-        self.assertIsInstance(mock_requests.post.call_args[1].get('headers'), dict)
-
-    @mock.patch('fcm_sender.sender.requests')
-    def test_send_message_request_has_expected_headers(self, mock_requests):
-        assert mock_requests is fcm_sender.sender.requests
-
-        self.sender.send_message(message="some message", topic="some topic")
-        headers = mock_requests.post.call_args[1].get('headers')
+    def test_send_message_request_has_expected_headers(self):
+        headers = self.mock_requests.post.call_args[1].get('headers')
         self.assertIn('Content-Type', headers)
         self.assertEqual(headers.get('Content-Type'), 'application/json')
         self.assertIn('Authorization', headers)
