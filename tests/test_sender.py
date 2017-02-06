@@ -1,7 +1,6 @@
 import unittest
 import mock
 import inspect
-from datetime import datetime
 
 from fcm_sender.sender import Sender
 import fcm_sender
