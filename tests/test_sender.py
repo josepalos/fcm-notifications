@@ -1,5 +1,7 @@
 import unittest
 import mock
+import inspect
+from datetime import datetime
 
 from fcm_sender.sender import Sender
 import fcm_sender
@@ -51,3 +53,29 @@ class TestSendMessage(unittest.TestCase):
 
         self.sender.send_message(message="some message", topic="some topic")
         self.assertIsInstance(mock_requests.post.call_args[1].get('data'), dict)
+
+    @staticmethod
+    def get_dict_with_args_and_defaults(method):
+        result = dict()
+
+        inspected = inspect.getargspec(method)
+        args_list = inspected.args
+        default_values = inspected.defaults
+        args_with_default_count = len(default_values)
+
+        args_with_no_default = args_list[:-args_with_default_count]
+        args_with_default = args_list[-args_with_default_count:]
+
+        for arg in args_with_no_default:
+            result[arg] = None
+
+        for arg, default in zip(args_with_default, default_values):
+            result[arg] = default
+
+        return result
+
+    @mock.patch('fcm_sender.sender.requests')  # patch used for avoid launching unnecessary requests.
+    def test_call_send_message_without_topic_uses_the_default_one(self, _):
+        send_message_params_with_defaults = self.get_dict_with_args_and_defaults(self.sender.send_message)
+        self.assertIsNotNone(send_message_params_with_defaults.get('topic'))
+        self.assertEqual(self.sender.default_topic, send_message_params_with_defaults.get('topic'))
