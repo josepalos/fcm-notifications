@@ -20,21 +20,21 @@ class SenderTest(unittest.TestCase):
 
 
 class TestSendMessage(unittest.TestCase):
+    def setUp(self):
+        self.sender = Sender()
+
     @mock.patch('fcm_sender.sender.requests')
     def test_send_message_uses_requests_to_send_an_http_post_request(self, mock_requests):
         assert mock_requests is fcm_sender.sender.requests
 
-        sender = Sender()
-        sender.send_message(message="")
+        self.sender.send_message(message="")
         assert mock_requests.post.called
 
     @mock.patch('fcm_sender.sender.requests')
     def test_send_message_uses_the_fcm_url(self, mock_requests):
         assert mock_requests is fcm_sender.sender.requests
-        expected_fcm_url = 'https://fcm.googleapis.com/fcm/send'
 
-        sender = Sender()
-        sender.send_message(message="")
+        self.sender.send_message(message="")
         self.assertIsNotNone(mock_requests.post.call_args[1].get('url'))
         self.assertEqual(mock_requests.post.call_args[1].get('url'), fcm_sender.sender.fcm_url)
 
@@ -42,16 +42,12 @@ class TestSendMessage(unittest.TestCase):
     def test_send_message_puts_data_in_the_request(self, mock_requests):
         assert mock_requests is fcm_sender.sender.requests
 
-        sender = Sender()
-        sender.send_message(message="some message")
-
+        self.sender.send_message(message="some message")
         self.assertIsNotNone(mock_requests.post.call_args[1].get('data'))
-
 
     @mock.patch('fcm_sender.sender.requests')
     def test_request_data_contains_dict_data(self, mock_requests):
         assert mock_requests is fcm_sender.sender.requests
 
-        sender = Sender()
-        sender.send_message(message="some message")
+        self.sender.send_message(message="some message")
         self.assertIsInstance(mock_requests.post.call_args[1].get('data'), dict)
