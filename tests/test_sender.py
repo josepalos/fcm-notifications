@@ -20,6 +20,9 @@ class SenderTest(unittest.TestCase):
     def test_send_message_accepts_also_a_topic(self):
         self.sender.send_message(message="some message", topic="some topic")
 
+    def test_sender_knows_the_api_secret_key(self):
+        self.assertIsNotNone(self.sender.api_key)
+
 
 class TestSendMessage(unittest.TestCase):
     def setUp(self):
@@ -86,3 +89,14 @@ class TestSendMessage(unittest.TestCase):
 
         self.sender.send_message(message="some message", topic="some topic")
         self.assertIsInstance(mock_requests.post.call_args[1].get('headers'), dict)
+
+    @mock.patch('fcm_sender.sender.requests')
+    def test_send_message_request_has_expected_headers(self, mock_requests):
+        assert mock_requests is fcm_sender.sender.requests
+
+        self.sender.send_message(message="some message", topic="some topic")
+        headers = mock_requests.post.call_args[1].get('headers')
+        self.assertIn('Content-Type', headers)
+        self.assertEqual(headers.get('Content-Type'), 'application/json')
+        self.assertIn('Authorization', headers)
+        self.assertEqual(headers.get('Authorization'), 'key={}'.format(self.sender.api_key))
