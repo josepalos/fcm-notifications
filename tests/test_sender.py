@@ -27,14 +27,14 @@ class TestSendMessage(unittest.TestCase):
     def test_send_message_uses_requests_to_send_an_http_post_request(self, mock_requests):
         assert mock_requests is fcm_sender.sender.requests
 
-        self.sender.send_message(message="")
+        self.sender.send_message(message="", topic="some topic")
         assert mock_requests.post.called
 
     @mock.patch('fcm_sender.sender.requests')
     def test_send_message_uses_the_fcm_url(self, mock_requests):
         assert mock_requests is fcm_sender.sender.requests
 
-        self.sender.send_message(message="")
+        self.sender.send_message(message="", topic="some topic")
         self.assertIsNotNone(mock_requests.post.call_args[1].get('url'))
         self.assertEqual(mock_requests.post.call_args[1].get('url'), fcm_sender.sender.fcm_url)
 
@@ -42,12 +42,12 @@ class TestSendMessage(unittest.TestCase):
     def test_send_message_puts_data_in_the_request(self, mock_requests):
         assert mock_requests is fcm_sender.sender.requests
 
-        self.sender.send_message(message="some message")
+        self.sender.send_message(message="some message", topic="some topic")
         self.assertIsNotNone(mock_requests.post.call_args[1].get('data'))
 
     @mock.patch('fcm_sender.sender.requests')
     def test_request_data_contains_dict_data(self, mock_requests):
         assert mock_requests is fcm_sender.sender.requests
 
-        self.sender.send_message(message="some message")
+        self.sender.send_message(message="some message", topic="some topic")
         self.assertIsInstance(mock_requests.post.call_args[1].get('data'), dict)
