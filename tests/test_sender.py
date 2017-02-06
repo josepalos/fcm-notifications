@@ -79,3 +79,10 @@ class TestSendMessage(unittest.TestCase):
         send_message_params_with_defaults = self.get_dict_with_args_and_defaults(self.sender.send_message)
         self.assertIsNotNone(send_message_params_with_defaults.get('topic'))
         self.assertEqual(self.sender.default_topic, send_message_params_with_defaults.get('topic'))
+
+    @mock.patch('fcm_sender.sender.requests')
+    def test_send_message_request_has_headers(self, mock_requests):
+        assert mock_requests is fcm_sender.sender.requests
+
+        self.sender.send_message(message="some message", topic="some topic")
+        self.assertIsInstance(mock_requests.post.call_args[1].get('headers'), dict)

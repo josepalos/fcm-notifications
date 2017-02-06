@@ -8,6 +8,6 @@ class Sender():
 
     def send_message(self, message, topic=default_topic):
         try:
-            requests.post(url=fcm_url, data={})
+            requests.post(url=fcm_url, data={}, headers={})
         except:
             pass
