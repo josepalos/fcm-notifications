@@ -53,8 +53,12 @@ class TestSendMessage(unittest.TestCase):
     @mock.patch('fcm_sender.sender.requests')
     def setUp(self, mock_requests):
         assert mock_requests is fcm_sender.sender.requests
+
+        self.topic = 'some_topic'
+        self.message = 'some message'
+
         self.sender = Sender()
-        self.sender.send_message(message="", topic="some topic")
+        self.sender.send_message(message=self.message, topic=self.topic)
         self.mock_requests = mock_requests
 
     def test_send_message_uses_requests_to_send_an_http_post_request(self):
@@ -79,3 +83,13 @@ class TestSendMessage(unittest.TestCase):
         self.assertEqual(headers.get('Content-Type'), 'application/json')
         self.assertIn('Authorization', headers)
         self.assertEqual(headers.get('Authorization'), 'key={}'.format(self.sender.api_key))
+
+    def test_send_message_sends_correct_request_payload(self):
+        payload = self.mock_requests.post.call_args[1].get('data')
+        self.assertIn('to', payload)
+        self.assertEqual(payload.get('to'), '/topic/{}'.format(self.topic))
+        self.assertIn('data', payload)
+        data = payload.get('data')
+
+        self.assertIn('message', data)
+        self.assertEqual(data.get('message'), self.message)

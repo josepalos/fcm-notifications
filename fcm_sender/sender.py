@@ -15,6 +15,11 @@ class Sender():
 
     def send_message(self, message, topic=default_topic):
         try:
-            requests.post(url=fcm_url, data={}, headers=self.create_headers())
+            requests.post(url=fcm_url, data={
+                'to': '/topic/{}'.format(topic),
+                'data': {
+                    'message': message
+                }
+            }, headers=self.create_headers())
         except:
             pass
