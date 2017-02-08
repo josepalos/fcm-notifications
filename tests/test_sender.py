@@ -86,7 +86,7 @@ class TestSendMessage(unittest.TestCase):
         payload_raw = self.mock_requests.post.call_args[1].get('data')
         payload = json.loads(payload_raw)
         self.assertIn('to', payload)
-        self.assertEqual(payload.get('to'), '/topic/{}'.format(self.topic))
+        self.assertEqual(payload.get('to'), '/topics/{}'.format(self.topic))
         self.assertIn('data', payload)
         data = payload.get('data')
 

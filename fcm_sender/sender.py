@@ -22,7 +22,7 @@ class Sender():
 
     def create_data(self, message, topic):
         return json.dumps({
-            'to': '/topic/{}'.format(topic),
+            'to': '/topics/{}'.format(topic),
             'data': {
                 'message': message
             }
