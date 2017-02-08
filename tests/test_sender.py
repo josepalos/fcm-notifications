@@ -118,3 +118,15 @@ class TestServerResponse(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             sender.send_message('message', 'topic')
+
+    @mock.patch('fcm_sender.sender.requests')
+    def test_send_message_error_401(self, mock_requests):
+        # when an error 401 is received, there is an error with the authentication.
+        sender = Sender()
+
+        error_message_response = fcm_sender.sender.requests.Response()
+        error_message_response.status_code = 401
+        mock_requests.post.return_value = error_message_response
+
+        with self.assertRaises(fcm_sender.sender.AuthError):
+            sender.send_message('message', 'topic')
