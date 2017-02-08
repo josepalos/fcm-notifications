@@ -92,3 +92,17 @@ class TestSendMessage(unittest.TestCase):
 
         self.assertIn('message', data)
         self.assertEqual(data.get('message'), self.message)
+
+
+class TestServerResponse(unittest.TestCase):
+    success_message_response = fcm_sender.sender.requests.Response()
+    success_message_response.__setstate__({
+        'json': {'message_id': '1023456'},
+        'status_code': 200
+    })
+
+    @mock.patch('fcm_sender.sender.requests')
+    def test_send_message_ok_when_success_response(self, mock_requests):
+        mock_requests.post.return_value = self.success_message_response
+        sender = Sender()
+        sender.send_message('some message', 'some topic')
