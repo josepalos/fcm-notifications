@@ -11,16 +11,16 @@ class SenderTest(unittest.TestCase):
     def setUp(self):
         self.sender = Sender()
 
-    def test_existing_sender(self):
-        pass
-
-    def test_sender_has_method_send_message_with_only_message(self):
+    @mock.patch('fcm_sender.sender.requests')  # patch used for avoid launching unnecessary requests.
+    def test_sender_has_method_send_message_with_only_message(self, _):
         self.sender.send_message(message="some message")
 
-    def test_send_message_accepts_also_a_topic(self):
+    @mock.patch('fcm_sender.sender.requests')  # patch used for avoid launching unnecessary requests.
+    def test_send_message_accepts_also_a_topic(self, _):
         self.sender.send_message(message="some message", topic="some topic")
 
-    def test_sender_knows_the_api_secret_key(self):
+    @mock.patch('fcm_sender.sender.requests')  # patch used for avoid launching unnecessary requests.
+    def test_sender_knows_the_api_secret_key(self, _):
         self.assertIsNotNone(self.sender.api_key)
 
     @staticmethod
