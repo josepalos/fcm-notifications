@@ -23,7 +23,6 @@ class Sender():
         })
 
     def send_message(self, message, topic=default_topic):
-        try:
-            requests.post(url=fcm_url, data=self.create_data(message, topic), headers=self.create_headers())
-        except:
-            pass
+        response = requests.post(url=fcm_url, data=self.create_data(message, topic), headers=self.create_headers())
+        if response.status_code == 400:
+            raise ValueError

@@ -106,3 +106,15 @@ class TestServerResponse(unittest.TestCase):
         mock_requests.post.return_value = self.success_message_response
         sender = Sender()
         sender.send_message('some message', 'some topic')
+
+    @mock.patch('fcm_sender.sender.requests')
+    def test_send_message_error_400(self, mock_requests):
+        # when an error 400 is received it means invalid fields or invalid json
+        sender = Sender()
+
+        error_message_response = fcm_sender.sender.requests.Response()
+        error_message_response.status_code = 400
+        mock_requests.post.return_value = error_message_response
+
+        with self.assertRaises(ValueError):
+            sender.send_message('message', 'topic')
