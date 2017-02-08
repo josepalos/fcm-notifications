@@ -1,6 +1,7 @@
 import unittest
 import mock
 import inspect
+import json
 
 from fcm_sender.sender import Sender
 import fcm_sender
@@ -71,9 +72,6 @@ class TestSendMessage(unittest.TestCase):
     def test_send_message_puts_data_in_the_request(self):
         self.assertIsNotNone(self.mock_requests.post.call_args[1].get('data'))
 
-    def test_request_data_contains_dict_data(self):
-        self.assertIsInstance(self.mock_requests.post.call_args[1].get('data'), dict)
-
     def test_send_message_request_has_headers(self,):
         self.assertIsInstance(self.mock_requests.post.call_args[1].get('headers'), dict)
 
@@ -85,7 +83,8 @@ class TestSendMessage(unittest.TestCase):
         self.assertEqual(headers.get('Authorization'), 'key={}'.format(self.sender.api_key))
 
     def test_send_message_sends_correct_request_payload(self):
-        payload = self.mock_requests.post.call_args[1].get('data')
+        payload_raw = self.mock_requests.post.call_args[1].get('data')
+        payload = json.loads(payload_raw)
         self.assertIn('to', payload)
         self.assertEqual(payload.get('to'), '/topic/{}'.format(self.topic))
         self.assertIn('data', payload)

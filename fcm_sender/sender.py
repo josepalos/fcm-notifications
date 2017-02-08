@@ -1,11 +1,12 @@
 import requests
+import json
 
 fcm_url = "https://fcm.googleapis.com/fcm/send"
 
 
 class Sender():
     default_topic = ""
-    api_key = ""
+    api_key = ''
 
     def create_headers(self):
         return {
@@ -14,12 +15,12 @@ class Sender():
         }
 
     def create_data(self, message, topic):
-        return {
+        return json.dumps({
             'to': '/topic/{}'.format(topic),
             'data': {
                 'message': message
             }
-        }
+        })
 
     def send_message(self, message, topic=default_topic):
         try:
