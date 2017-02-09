@@ -95,11 +95,26 @@ class TestSendMessage(unittest.TestCase):
 
 
 class TestServerResponse(unittest.TestCase):
-    success_message_response = fcm_sender.sender.requests.Response()
-    success_message_response.__setstate__({
-        'json': {'message_id': '1023456'},
-        'status_code': 200
-    })
+    @staticmethod
+    def create_response(status_code, json_content=None):
+        response = fcm_sender.sender.requests.Response()
+        response.status_code = status_code
+        if json_content is not None:
+            response.json = json_content
+        return response
+
+    def check_response_raises_exception(self, response, exception):
+        with mock.patch('fcm_sender.sender.requests') as mock_requests:
+            mock_requests.post.return_value = response
+
+            sender = Sender()
+
+            with self.assertRaises(exception):
+                sender.send_message('message', 'topic')
+
+    @classmethod
+    def setUpClass(cls):
+        cls.success_message_response = cls.create_response(200, {'message_id': '1023456'})
 
     @mock.patch('fcm_sender.sender.requests')
     def test_send_message_ok_when_success_response(self, mock_requests):
@@ -107,26 +122,11 @@ class TestServerResponse(unittest.TestCase):
         sender = Sender()
         sender.send_message('some message', 'some topic')
 
-    @mock.patch('fcm_sender.sender.requests')
-    def test_send_message_error_400_raises_ValueError(self, mock_requests):
-        # when an error 400 is received it means invalid fields or invalid json
-        sender = Sender()
+    def test_send_message_error_400_raises_ValueError(self):
+        error_message_response = self.create_response(400)
+        self.check_response_raises_exception(error_message_response, ValueError)
 
-        error_message_response = fcm_sender.sender.requests.Response()
-        error_message_response.status_code = 400
-        mock_requests.post.return_value = error_message_response
+    def test_send_message_error_401_raises_AuthError(self):
+        error_message_response = self.create_response(401)
+        self.check_response_raises_exception(error_message_response, fcm_sender.sender.AuthError)
 
-        with self.assertRaises(ValueError):
-            sender.send_message('message', 'topic')
-
-    @mock.patch('fcm_sender.sender.requests')
-    def test_send_message_error_401_raises_AuthError(self, mock_requests):
-        # when an error 401 is received, there is an error with the authentication.
-        sender = Sender()
-
-        error_message_response = fcm_sender.sender.requests.Response()
-        error_message_response.status_code = 401
-        mock_requests.post.return_value = error_message_response
-
-        with self.assertRaises(fcm_sender.sender.AuthError):
-            sender.send_message('message', 'topic')
