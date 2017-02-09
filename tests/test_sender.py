@@ -130,3 +130,20 @@ class TestServerResponse(unittest.TestCase):
         error_message_response = self.create_response(401)
         self.check_response_raises_exception(error_message_response, fcm_sender.sender.AuthError)
 
+    def test_response_with_5XX_raises_an_UnavailableServiceError(self):
+        for code in range(500, 599):
+            error_message_response = self.create_response(code)
+            self.check_response_raises_exception(error_message_response, fcm_sender.sender.UnavailableServiceError)
+
+    def response_200_with_unavailable_service_errors_raises_UnavailableServiceError(self, error_message):
+        error_message_response = self.create_response(200, {'error': error_message})
+        self.check_response_raises_exception(error_message_response, fcm_sender.sender.UnavailableServiceError)
+
+    def test_response_200_but_data_contains_error_Unavailable_raises_an_UnavailableServiceError(self):
+        self.response_200_with_unavailable_service_errors_raises_UnavailableServiceError('Unavailable')
+
+    def test_response_200_but_data_contains_error_InternalServerError_raises_an_UnavailableServiceError(self):
+        self.response_200_with_unavailable_service_errors_raises_UnavailableServiceError('InternalServerError')
+
+    def test_response_200_but_data_contains_error_TopicMessageRateExceeded_raises_an_UnavailableServiceError(self):
+        self.response_200_with_unavailable_service_errors_raises_UnavailableServiceError('TopicMessageRateExceeded')

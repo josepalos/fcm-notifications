@@ -10,6 +10,11 @@ class AuthError(Exception):
         self.message = message
 
 
+class UnavailableServiceError(Exception):
+    def __init__(self):
+        super(UnavailableServiceError, self).__init__()
+
+
 class Sender():
     default_topic = ''
     api_key = ''
@@ -34,3 +39,9 @@ class Sender():
             raise ValueError
         elif response.status_code == 401:
             raise AuthError('Error on the authentication')
+        elif 500 <= response.status_code <= 599:
+            raise UnavailableServiceError
+        else:
+            json_content = response.json
+            if 'error' in json_content:
+                raise UnavailableServiceError
