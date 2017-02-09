@@ -108,7 +108,7 @@ class TestServerResponse(unittest.TestCase):
         sender.send_message('some message', 'some topic')
 
     @mock.patch('fcm_sender.sender.requests')
-    def test_send_message_error_400(self, mock_requests):
+    def test_send_message_error_400_raises_ValueError(self, mock_requests):
         # when an error 400 is received it means invalid fields or invalid json
         sender = Sender()
 
@@ -120,7 +120,7 @@ class TestServerResponse(unittest.TestCase):
             sender.send_message('message', 'topic')
 
     @mock.patch('fcm_sender.sender.requests')
-    def test_send_message_error_401(self, mock_requests):
+    def test_send_message_error_401_raises_AuthError(self, mock_requests):
         # when an error 401 is received, there is an error with the authentication.
         sender = Sender()
 

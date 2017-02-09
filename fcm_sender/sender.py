@@ -1,7 +1,7 @@
 import requests
 import json
 
-fcm_url = "https://fcm.googleapis.com/fcm/send"
+fcm_url = 'https://fcm.googleapis.com/fcm/send'
 
 
 class AuthError(Exception):
@@ -11,7 +11,7 @@ class AuthError(Exception):
 
 
 class Sender():
-    default_topic = ""
+    default_topic = ''
     api_key = ''
 
     def create_headers(self):
