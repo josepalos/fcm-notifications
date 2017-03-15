@@ -100,7 +100,9 @@ class TestServerResponse(unittest.TestCase):
         response = fcm_sender.sender.requests.Response()
         response.status_code = status_code
         if json_content is not None:
-            response.json = json_content
+            response.json = lambda: json_content  # correct this
+
+        print "Mocked content: %s" % response.content
         return response
 
     def check_response_raises_exception(self, response, exception):

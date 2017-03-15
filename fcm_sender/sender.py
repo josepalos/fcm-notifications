@@ -18,6 +18,7 @@ class UnavailableServiceError(Exception):
 class Sender():
     default_topic = ''
     api_key = ''
+    sender_id = ''
 
     def create_headers(self):
         return {
@@ -29,7 +30,8 @@ class Sender():
         return json.dumps({
             'to': '/topics/{}'.format(topic),
             'data': {
-                'message': message
+                'message': message,
+                'sender_id': self.sender_id
             }
         })
 
@@ -42,6 +44,6 @@ class Sender():
         elif 500 <= response.status_code <= 599:
             raise UnavailableServiceError
         else:
-            json_content = response.json
+            json_content = response.json()
             if 'error' in json_content:
                 raise UnavailableServiceError
