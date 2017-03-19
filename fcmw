@@ -1,14 +1,12 @@
 #!/bin/bash
 
-set -x
-
 get_default_message(){
     message="Command $task finished with status $exit_status"
 }
 
 OPTIND=1 #reset the counter just in case
 
-VIRTUAL_ENV="~/.virtualenvs/fcm_sender/bin/python"
+PYTHON_PATH="~/.virtualenvs/fcm_sender/bin/python"
 SENDER_PATH="~/vamk/sep/fcm_notifications_sender/fcm_sender"
 
 topic="global"
@@ -58,4 +56,4 @@ echo "Topic: $topic";
 echo "Message: $message"
 echo "Command: $task"
 
-eval "$VIRTUAL_ENV $SENDER_PATH -t $topic \"$message\""
+eval "$PYTHON_PATH $SENDER_PATH -t $topic \"$message\""
