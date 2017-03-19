@@ -47,7 +47,7 @@ class SenderTest(unittest.TestCase):
     def test_call_send_message_without_topic_uses_the_default_one(self, _):
         send_message_params_with_defaults = self.get_dict_with_args_and_defaults(self.sender.send_message)
         self.assertIsNotNone(send_message_params_with_defaults.get('topic'))
-        self.assertEqual(self.sender.default_topic, send_message_params_with_defaults.get('topic'))
+        self.assertEqual(fcm_sender.sender.DEFAULT_TOPIC, send_message_params_with_defaults.get('topic'))
 
 
 class TestSendMessage(unittest.TestCase):
